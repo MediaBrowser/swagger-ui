@@ -104,7 +104,7 @@ function getParameterByName(name, url) {
 
 // Build a system
   const ui = SwaggerUIBundle({
-    url: getParameterByName('url') || "http://localhost:8096/swagger.json",
+    url: getParameterByName('url') || "http://localhost:8096/swagger",
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [
