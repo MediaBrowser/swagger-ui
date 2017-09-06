@@ -72,9 +72,39 @@
 <script>
 window.onload = function() {
   
-  // Build a system
+  function getWindowLocationSearch(win) {
+    'use strict';
+
+    var search = (win || window).location.search;
+
+    if (!search) {
+
+        var index = window.location.href.indexOf('?');
+        if (index != -1) {
+            search = window.location.href.substring(index);
+        }
+    }
+
+    return search || '';
+}
+
+function getParameterByName(name, url) {
+    'use strict';
+
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regexS = "[\\?&]" + name + "=([^&#]*)";
+    var regex = new RegExp(regexS, "i");
+
+    var results = regex.exec(url || getWindowLocationSearch());
+    if (results == null)
+        return "";
+    else
+        return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+// Build a system
   const ui = SwaggerUIBundle({
-    url: "http://petstore.swagger.io/v2/swagger.json",
+    url: getParameterByName('url') || "http://localhost:8096/swagger.json",
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [
