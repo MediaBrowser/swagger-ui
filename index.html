@@ -1,41 +1,42 @@
 ﻿<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600,700|Titillium+Web:400,600,700" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="./swagger-ui.css">
+    <link rel="stylesheet" type="text/css" href="./emby-custom.css">
     <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
     <style>
-      html
-      {
-        box-sizing: border-box;
-        overflow: -moz-scrollbars-vertical;
-        overflow-y: scroll;
-      }
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
 
-      *,
-      *:before,
-      *:after
-      {
-        box-sizing: inherit;
-      }
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
 
-      body
-      {
-        margin:0;
-        background: #fafafa;
-      }
+        body {
+            margin: 0;
+            background: #fafafa;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div id="swagger-ui"></div>
 
-    <script src="./swagger-ui-bundle.js"> </script>
-    <script src="./swagger-ui-standalone-preset.js"> </script>
+    <script src="./swagger-ui-bundle.js"></script>
+    <script src="./swagger-ui-standalone-preset.js"></script>
+    <script src="./emby-custom.js"></script>
+
     <script>
         window.onload = function () {
 
@@ -47,7 +48,7 @@
                 if (!search) {
 
                     var index = window.location.href.indexOf('?');
-                    if (index != -1) {
+                    if (index !== -1) {
                         search = window.location.href.substring(index);
                     }
                 }
@@ -69,23 +70,42 @@
                     return decodeURIComponent(results[1].replace(/\+/g, " "));
             }
 
-            // Build a system
-            const ui = SwaggerUIBundle({
-                url: getParameterByName('url') || "http://localhost:8096/swagger",
+            // Create Configuration
+            const config = {
+                url: getParameterByName('url') || "http://localhost:8096/openapi",
                 dom_id: '#swagger-ui',
                 deepLinking: true,
+                defaultModelRendering: 'model',
+                docExpansion: 'none',
+                tagsSorter: 'alpha',
+                showExtensions: false,
+                filter: true,
                 presets: [
                     SwaggerUIBundle.presets.apis,
                     SwaggerUIStandalonePreset
                 ],
                 plugins: [
-                    SwaggerUIBundle.plugins.DownloadUrl
+                    SwaggerUIBundle.plugins.DownloadUrl,
+                    caseInsensitivePhraseFilter,
+                    renderPrimitive,
+                    renderEnum,
+                    renderArray
                 ],
-                layout: "StandaloneLayout"
-            })
+                layout: 'StandaloneLayout'
+            };
 
-            window.ui = ui
+            if (getParameterByName('staticview')) {
+
+                config.plugins = [caseInsensitivePhraseFilter, disableAuthorizePlugin, hideTopbarPlugin,
+                    renderPrimitive, renderEnum, renderArray];
+                config.url = 'openapi.json';
+                config.supportedSubmitMethods = [];
+            }
+
+            // Build a system
+            const ui = SwaggerUIBundle(config);
+            window.ui = ui;
         }
     </script>
-  </body>
+</body>
 </html>
