@@ -36,9 +36,10 @@
     <script src="./swagger-ui-bundle.js"></script>
     <script src="./swagger-ui-standalone-preset.js"></script>
     <script src="./emby-custom.js"></script>
+    <script src="./emby-auth.js"></script>
 
     <script>
-        window.onload = function () {
+        window.onload = function() {
 
             function getWindowLocationSearch(win) {
                 'use strict';
@@ -70,6 +71,30 @@
                     return decodeURIComponent(results[1].replace(/\+/g, " "));
             }
 
+            function preauthorizeApiKey(system, key, value) {
+                const {
+                    authActions: { authorize },
+                    specSelectors: { specJson, isOAS3 }
+                } = system;
+
+                const definitionBase = isOAS3() ? ["components", "securitySchemes"] : ["securityDefinitions"];
+
+                const schema = specJson().getIn([...definitionBase, key]);
+
+                if(!schema) {
+                    return null;
+                }
+
+                return authorize({
+                    [key]: {
+                        value,
+                        schema: schema.toJS()
+                    }
+                });
+            }
+
+            var apikey = getParameterByName('api_key');
+
             // Create Configuration
             const config = {
                 url: getParameterByName('url') || "http://localhost:8096/openapi",
@@ -89,17 +114,27 @@
                     caseInsensitivePhraseFilter,
                     renderPrimitive,
                     renderEnum,
-                    renderArray
+                    renderArray,
+                    renderHttpAuth,
+                    renderAuths
                 ],
-                layout: 'StandaloneLayout'
-            };
+                layout: 'StandaloneLayout',
+                onComplete: function() {
+                    if (apikey && apikey.trim() !== '') {
+                        preauthorizeApiKey(ui, 'apikeyauth', apikey);
+                    }
+                }
+            }
 
             if (getParameterByName('staticview')) {
 
-                config.plugins = [caseInsensitivePhraseFilter, disableAuthorizePlugin, hideTopbarPlugin,
-                    renderPrimitive, renderEnum, renderArray];
+                config.plugins = [
+                    caseInsensitivePhraseFilter, disableAuthorizePlugin, hideTopbarPlugin,
+                    renderPrimitive, renderEnum, renderArray
+                ];
                 config.url = 'openapi.json';
                 config.supportedSubmitMethods = [];
+                apikey = null;
             }
 
             // Build a system
