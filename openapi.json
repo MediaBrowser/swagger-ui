@@ -8,7 +8,7 @@
       "name": "Emby Developers",
       "url": "https://emby.media/community/index.php?/forum/47-developer-api"
     },
-    "version": "3.4.1.29"
+    "version": "3.4.1.30"
   },
   "servers": [
     {
@@ -9876,6 +9876,70 @@
           }
         ],
         "x-RequiredAuthentication": "Requires authentication as user"
+      }
+    },
+    "/Devices/Info": {
+      "summary": "Gets info for a device",
+      "get": {
+        "tags": [
+          "DeviceService"
+        ],
+        "summary": "Gets info for a device",
+        "description": "Requires authentication as administrator",
+        "operationId": "getDevicesInfo",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "description": "Device Id",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation successful. Returning a DeviceInfo object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Devices.DeviceInfo"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/Devices.DeviceInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/5XX"
+          }
+        },
+        "security": [
+          {
+            "apikeyauth": [ ]
+          },
+          {
+            "embyauth": [ ]
+          }
+        ],
+        "x-RequiredAuthentication": "Requires authentication as administrator"
       }
     },
     "/Devices/CameraUploads": {
@@ -49624,6 +49688,12 @@
           "Name": {
             "type": "string"
           },
+          "ReportedName": {
+            "type": "string"
+          },
+          "CustomName": {
+            "type": "string"
+          },
           "Id": {
             "type": "string"
           },
@@ -55737,13 +55807,13 @@
     "securitySchemes": {
       "apikeyauth": {
         "type": "apiKey",
-        "description": "**ApiKey Authentication**\nThe api key can alternatively be specified in an http header named *X-Emby-Token*",
+        "description": "**ApiKey Authentication**  \nAPI keys are static access tokens providing access to the Emby API for external applications.  \n  \nKeys can be created from the Server Dashboard under **Advanced > Security**  \nThe api key can alternatively be specified in an http header named _X-Emby-Token_  \nFor details please see the [API Documentation: ApiKey Authentication](https://github.com/MediaBrowser/Emby/wiki/ApiKeyAuthentication)",
         "name": "api_key",
         "in": "query"
       },
       "embyauth": {
         "type": "http",
-        "description": "**Emby Authentication**\nToken must be acquired via */Users/AuthenticateByName*.\nFor details please see https://github.com/MediaBrowser/Emby/wiki/Authentication",
+        "description": "**Emby User Authentication**  \nAn access token must be acquired via _/Users/AuthenticateByName_ and then sent in an http header with every reuest.  \nFor details please see the [API Documentation: Authentication](https://github.com/MediaBrowser/Emby/wiki/Authentication)  \n**(not available for interative tryout)**",
         "scheme": "bearer",
         "bearerFormat": "Emby UserId=\"(guid)\", Client=\"(string)\", Device=\"(string)\", DeviceId=\"(string)\", Version=\"string\", Token=\"(string)\""
       }
