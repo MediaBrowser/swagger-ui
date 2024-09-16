@@ -138,9 +138,7 @@ function renderPrimitive() {
                 const description = schema.get('description');
                 //let extensions = getExtensions(schema);
                 const properties = schema
-                    .filter((v, key) => ['enum', 'type', 'format', 'description', 'nullable', '$$ref'].indexOf(key) ===
-                        -1)
-                    .filterNot((v, key) => extensions.has(key));
+                    .filter((v, key) => ['enum', 'type', 'format', 'description', 'nullable', '$$ref'].indexOf(key) === -1);
                 const Markdown = getComponent('Markdown');
                 const EnumModel = getComponent('EnumModel');
                 const Property = getComponent('Property');
